@@ -1,5 +1,5 @@
 const db = require('../server/db');
-const { User } = require('../server/db/models/user');
+const User = require('../server/db/models/user');
 
 async function seed() {
   await db.sync({ force: true });
