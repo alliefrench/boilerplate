@@ -3,6 +3,7 @@ const path = require('path');
 const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const db = require('./db');
 
 app.use(morgan('dev'));
 
@@ -24,8 +25,11 @@ app.use(function(err, req, res, next) {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, function() {
-  console.log(`Heyyyy, I'm listening on port ${port}`);
+
+db.sync().then(function() {
+  app.listen(port, function() {
+    console.log(`Heyyyy, I'm listening on port ${port}`);
+  });
 });
 
 module.exports = app;
