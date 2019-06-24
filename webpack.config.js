@@ -1,10 +1,13 @@
 const isDev = process.env.NODE_ENV === 'development';
 
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
 module.exports = {
   mode: isDev ? 'development' : 'production',
   entry: [
     '@babel/polyfill', // enables async-await
     './client/index.js',
+    './client/style.css',
   ],
   output: {
     path: __dirname, // assumes your bundle.js will also be in the root of your project folder
@@ -21,8 +24,11 @@ module.exports = {
         },
       },
       {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
+        test: /\.css?$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader'],
+        }),
       },
     ],
   },
