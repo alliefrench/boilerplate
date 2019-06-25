@@ -4,8 +4,39 @@ const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const db = require('./db');
+const session = require('express-session');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const dbStore = new SequelizeStore({ db: db });
+const passport = require('passport');
 
 app.use(morgan('dev'));
+
+dbStore.sync();
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'a wildly insecure secret',
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+passport.serializeUser((user, done) => {
+  try {
+    done(null, user.id);
+  } catch (error) {
+    done(error);
+  }
+});
+
+passport.deserializeUser((id, done) => {
+  User.findById(id)
+    .then(user => done(null, user))
+    .catch(done);
+});
+
+app.user(passport.initialize());
+app.use(passport.session());
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
